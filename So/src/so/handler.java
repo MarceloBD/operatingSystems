@@ -10,7 +10,6 @@ public class handler{
     List<fullProcess> inputedL;    //List of associated processes and its resources        
     List<fullProcess> inCpu;       //List of process in cpu  
     changePriority changeP;
-    output out;
     /** Sets the list as the inputed for testing **/
     public handler(List<fullProcess> inputedL, changePriority changeP){
         this.inputedL = inputedL;
@@ -18,11 +17,10 @@ public class handler{
         this.changeP = changeP;
     }
     /** Starts the control system **/
-    public void run(){
-        this.checkEndedResource();
-        this.tryDeleteProcess();
-        this.checkDeadline();
+    public void run(){ 
         this.tryInsertProcess();
+        this.checkEndedResource();
+         this.tryDeleteProcess();
         process p = this.requestResource(changeP.getProcess());    
         if(p != null){
        //     if(this.alreadyStored(changeP.getProcess()) == false)
@@ -32,13 +30,6 @@ public class handler{
             changeP.change(p); 
             changeP.getProcess().setBlocked(true);
         }
-    }
-    public void addOutput(fullProcess p){
-        out.addOutput(p);
-    }
-    
-    public void setOutput(output out){
-        this.out = out;
     }
     public boolean alreadyStored(process p){
         Iterator<Integer> ip= changeP.getStoredId().iterator();
@@ -65,19 +56,6 @@ public class handler{
         this.backPrio(changeP.getProcess(),backPrioCounter(changeP.getProcess()));
     }
     
-    public void trySetInsertTime(process proc){
-        fullProcess full = this.getActualFullProcess(proc);
-        if(full.getProcess().getExtime()==0){
-            full.setInsertCpuTime(changeP.getTime());
-            System.out.println("================"+ full.getInsertCpuTime());
-        }
-        
-        
-    }
-    public void setFinishTime(fullProcess full){
-        full.setFinishedTime(changeP.getTime());
-        System.out.println("++++++++++++++"+full.getFinishedTime());
-    }
     public void backPrio(process p, int c){
         if(p==null || c<1)
             return;
@@ -123,8 +101,6 @@ public class handler{
             if (full.getProcess().getId() == changeP.getProcess().getId()){
                 if (changeP.getProcess().getExtime() == full.getWeight()){
                     changeP.deleteProcess();
-                    this.setFinishTime(full);
-                    out.addOutput(full);
                     it.remove();
                     this.wakeProcessForResource();
                 }
@@ -138,11 +114,10 @@ public class handler{
         while(ir.hasNext()){
             fullProcess full = ir.next();
             if (full.getArriveTime() == changeP.getTime()){
-                full.setPriority(-(changeP.getTime()+1) + (full.getProcess().getDline()+full.getArriveTime()));
-             
+                full.getProcess().setPriority(-changeP.getTime() + (full.getProcess().getDline()+full.getArriveTime()));
                 changeP.addQueue(full.getProcess());
                 inCpu.add(full);
-                System.out.println("Processo chegando: "+ full.getProcess().getId() + " prioridade: "+full.getProcess().getPriority());
+                System.out.println("Processo chegando: "+ full.getProcess().getId());
                 ir.remove();    
             }
         }
@@ -169,33 +144,6 @@ public class handler{
    //             changeP.changeProcessP(changeP.getProcess(), changeP.getChange());
           //      }
             }
-        }
-    }
-    public void checkDeadline(){
-        Iterator<fullProcess> fi = this.inCpu.iterator();
-        while(fi.hasNext()){
-            fullProcess full = fi.next();
-            if(full.getProcess().getPriority()<0){
-                System.out.println("Passou do deadline e não foi possivel executar");
-                out.addOutput(full);
-                this.deleteLostP(full.getProcess());
-                fi.remove();
-                changeP.addLostDline();
-            }
-        }
-    
-    }
-    public void deleteLostP(process p){
-        Iterator<process> ip = changeP.getQueue().iterator();
-        while(ip.hasNext()){
-            process pInQ = ip.next();
-            if(pInQ.getId() == p.getId()){
-                ip.remove();
-                return;
-            }
-        }
-        if(changeP.getProcess().getId() == p.getId()){
-            changeP.deleteProcess();
         }
     }
    

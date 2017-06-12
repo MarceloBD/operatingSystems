@@ -14,7 +14,7 @@ public class changePriority{
     process newProcess;             //process that is tested to replace the actual
     final int nullProcessPrio = 
             Integer.MAX_VALUE;      //priority of a null process
-    int lostDeadline;
+    
     public void addStoredId(int id){this.storedID.add(id);}
     public void addStoredPrio(int prio){this.storedPrio.add(prio);}
     public List<Integer> getStoredId(){return this.storedID;}
@@ -28,7 +28,6 @@ public class changePriority{
         proc.setDone();
         this.storedPrio = new ArrayList();
         this.storedID = new ArrayList();
-        this.lostDeadline = 0;
     }
     /** Scheduler itself, main function **/
     public void run(handler hand){
@@ -46,18 +45,16 @@ public class changePriority{
             if (isConflict == false){this.notConflict();}
             else{this.conflict(lastresources);}    
         }
-        this.trySetInsertTime(hand, proc);
         proc.addExeTime();
         hand.addTimeRes(proc);
         time++;
+        this.updatePrio();
         this.printScheduler();
         System.out.println("Recursos usados pelo processo atual: "+proc.getResource() + " Prioridade do processo atual: !"+this.proc.getPriority() +"! Processos em espera: "+this.priorityQueue );
         System.out.println("Processos com prioridade trocada: "+this.storedID);
         printPrio();
-        this.updatePrio();
     }
-    public void addLostDline(){this.lostDeadline++;}
-    public int getLostDline(){return this.lostDeadline;}
+    
     public void updatePrio(){
         Iterator<process> ip = this.getQueue().iterator();
         while(ip.hasNext()){
@@ -83,14 +80,6 @@ public class changePriority{
             process p = ip.next();
             System.out.println("Processo aguardado: "+p.getId()+" Prioridade: "+p.getPriority());
         }
-    }
-    
-    
-    
-    public void trySetInsertTime(handler hand, process p){
-        if(p == null||p.getId()==-1)
-            return;
-        hand.trySetInsertTime(p);
     }
     
     /** If there is not a process, set a null process as executing **/
@@ -155,20 +144,10 @@ public class changePriority{
         if (proc.getDone() != true){
             lowestPrio = proc.getPriority();
         }
-        for(process p: priorityQueue){
-            if(p.getBlocked()==false){
-                if(p.getPriority()<lowestPrio ){
-                    lowestPrio = p.getPriority();
-                    newProcess = p;
-                }else if(p.getPriority()==lowestPrio&&newProcess==null||p.getPriority()==lowestPrio&&newProcess.getBlocked()==true){
-                    if(proc.getBlocked()==true){
-                        lowestPrio = p.getPriority();
-                        newProcess = p;
-                    }
-                }
-                else{
-                    break;
-                }
+        for(process p: priorityQueue){      
+            if(p.getPriority()<=lowestPrio && p.getBlocked()==false){
+                lowestPrio = p.getPriority();
+                newProcess = p;
             }
         }
         return lowestPrio;

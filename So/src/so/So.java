@@ -11,14 +11,12 @@ import java.util.List;
 public class So{
     public static void main(String[] args) {
         List<fullProcess> input = new ArrayList();
-        //input.add(new testproc(id, start, weight, deadline, new Arraylist(){{add(new resource(id, start, weight)}}
-        input.add(new fullProcess(1,0,6,6, new ArrayList(){{add(new resource(0, 0, 3));add(new resource(1, 0, 3));}}));
-        input.add(new fullProcess(2,0,6,6, new ArrayList(){{add(new resource(0, 1, 1));}}));
-        input.add(new fullProcess(3,2,2,5, new ArrayList(){{add(new resource(0, 1, 1));}}));
+        //input.add(new testproc(id, start, weight, deadline, priority, new Arraylist(){{add(new resource(id, start, weight)}}
+        input.add(new fullProcess(1,0,3,16,3, new ArrayList(){{add(new resource(0, 0, 3));}}));
+        input.add(new fullProcess(2,1,2,6,2, new ArrayList(){{add(new resource(0, 1, 1));}}));
+        input.add(new fullProcess(3,2,2,5,2, new ArrayList(){{add(new resource(0, 1, 1));}}));
         changePriority changeP = new changePriority();
         handler hand = new handler(input, changeP);
-        output out = new output();
-        hand.setOutput(out);
         boolean cpurunning = true;
         while(cpurunning == true){
            System.out.println("----------------------------------------");
@@ -27,8 +25,6 @@ public class So{
            if(changeP.getTime() == 50)
                break;
        }
-       System.out.println("Processos perdidos: "+changeP.getLostDline());
-       out.printOutput();
     }
 }
 /** Class defining the process arriving at the scheduler **/
@@ -106,22 +102,14 @@ class fullProcess{
     int arriveTime;             //arrive time 
     int weight;                 //weight
     process proc;               //process related to these parameters 
-    int insetCpuTime;
-    int finishedTime;
     List<resource> resources;   //list of resource class    
     /** Sets the parameters to control the process **/
-    public fullProcess(int id, int arrive, int weight, int dline, List<resource> resources){        
+    public fullProcess(int id, int arrive, int weight,int dline, int priority, List<resource> resources){        
         this.arriveTime = arrive;       
         this.weight = weight;       
         this.resources = resources; 
-        this.proc = new process(id, dline, Integer.MAX_VALUE); 
-        this.insetCpuTime = Integer.MAX_VALUE;
-        this.finishedTime = Integer.MAX_VALUE;
+        this.proc = new process(id, dline, priority); 
     }
-    public void setFinishedTime(int t){this.finishedTime = t;}
-    public int getFinishedTime(){return this.finishedTime;}
-    public void setInsertCpuTime(int t){this.insetCpuTime = t;}
-    public int getInsertCpuTime(){return this.insetCpuTime;}
     /** Getter and Setter methods **/
     public int getArriveTime(){return this.arriveTime;}
     public int getId() {return proc.getId();}
@@ -130,6 +118,4 @@ class fullProcess{
     public List<resource> getResource() {return this.resources;}
     public void setResource(List<Integer> resource) {proc.setResource(resource);}
     public process getProcess(){return this.proc;}
-    public void setPriority(int prio){this.proc.setPriority(prio);}
-    public void setProcess(process p){this.proc = p;}
 }
