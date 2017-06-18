@@ -9,7 +9,8 @@ import java.util.List;
 public class handler{                            
     List<fullProcess> inputedL;    //List of associated processes and its resources        
     List<fullProcess> inCpu;       //List of process in cpu  
-    changePriority changeP;
+    changePriority changeP;        //Scheduler
+    output out;                    //Output class
     /** Sets the list as the inputed for testing **/
     public handler(List<fullProcess> inputedL, changePriority changeP){
         this.inputedL = inputedL;
@@ -17,10 +18,11 @@ public class handler{
         this.changeP = changeP;
     }
     /** Starts the control system **/
-    public void run(){ 
-        this.tryInsertProcess();
+    public void run(){
         this.checkEndedResource();
-         this.tryDeleteProcess();
+        this.tryDeleteProcess();
+        this.checkDeadline();
+        this.tryInsertProcess();
         process p = this.requestResource(changeP.getProcess());    
         if(p != null){
        //     if(this.alreadyStored(changeP.getProcess()) == false)
@@ -31,6 +33,15 @@ public class handler{
             changeP.getProcess().setBlocked(true);
         }
     }
+    /** Adds the process to the outputed processes list **/
+    public void addOutput(fullProcess p){
+        out.addOutput(p);
+    }
+    /** Sets the object of the class output to the class**/
+    public void setOutput(output out){
+        this.out = out;
+    }
+    /** Checks if the process has already been put in the stored list in changeP (function unused) **/
     public boolean alreadyStored(process p){
         Iterator<Integer> ip= changeP.getStoredId().iterator();
         while(ip.hasNext()){
@@ -41,6 +52,7 @@ public class handler{
         }
         return false;
     }
+    /** Try to unblock process that was waiting for resources **/
     public void wakeProcessForResource(){
         Iterator<process> ip = changeP.getQueue().iterator();
         while(ip.hasNext()){
@@ -55,7 +67,20 @@ public class handler{
         }
         this.backPrio(changeP.getProcess(),backPrioCounter(changeP.getProcess()));
     }
-    
+    /** Tries to insert the time that the process got to be executed for the first time **/
+    public void trySetInsertTime(process proc){
+        fullProcess full = this.getActualFullProcess(proc);
+        if(full.getProcess().getExtime()==0){
+            full.setInsertCpuTime(changeP.getTime());
+            System.out.println("================"+ full.getInsertCpuTime());
+        }
+    }
+    /** Sets the time that the process has finished its execution **/
+    public void setFinishTime(fullProcess full){
+        full.setFinishedTime(changeP.getTime());
+        System.out.println("++++++++++++++"+full.getFinishedTime());
+    }
+    /** Process receives its last priority that had been changed **/
     public void backPrio(process p, int c){
         if(p==null || c<1)
             return;
@@ -76,7 +101,7 @@ public class handler{
             }
         }
     }
-    
+    /** Gets the last priority instance of the storedPrio list **/
     public int backPrioCounter(process p){
         if(p==null)
             return -1;
@@ -101,6 +126,8 @@ public class handler{
             if (full.getProcess().getId() == changeP.getProcess().getId()){
                 if (changeP.getProcess().getExtime() == full.getWeight()){
                     changeP.deleteProcess();
+                    this.setFinishTime(full);
+                    out.addOutput(full);
                     it.remove();
                     this.wakeProcessForResource();
                 }
@@ -114,10 +141,11 @@ public class handler{
         while(ir.hasNext()){
             fullProcess full = ir.next();
             if (full.getArriveTime() == changeP.getTime()){
-                full.getProcess().setPriority(-changeP.getTime() + (full.getProcess().getDline()+full.getArriveTime()));
+                full.setPriority(-(changeP.getTime()+1) + (full.getProcess().getDline()+full.getArriveTime()));
+             
                 changeP.addQueue(full.getProcess());
                 inCpu.add(full);
-                System.out.println("Processo chegando: "+ full.getProcess().getId());
+                System.out.println("Processo chegando: "+ full.getProcess().getId() + " prioridade: "+full.getProcess().getPriority());
                 ir.remove();    
             }
         }
@@ -146,7 +174,35 @@ public class handler{
             }
         }
     }
-   
+    /** Checks if the priority of the process is invalid (-1), so set the process as lost **/
+    public void checkDeadline(){
+        Iterator<fullProcess> fi = this.inCpu.iterator();
+        while(fi.hasNext()){
+            fullProcess full = fi.next();
+            if(full.getProcess().getPriority()<0){
+                System.out.println("Passou do deadline e não foi possivel executar");
+                out.addOutput(full);
+                this.deleteLostP(full.getProcess());
+                fi.remove();
+                changeP.addLostDline();
+            }
+        }
+    
+    }
+    /** Delete lost process **/
+    public void deleteLostP(process p){
+        Iterator<process> ip = changeP.getQueue().iterator();
+        while(ip.hasNext()){
+            process pInQ = ip.next();
+            if(pInQ.getId() == p.getId()){
+                ip.remove();
+                return;
+            }
+        }
+        if(changeP.getProcess().getId() == p.getId()){
+            changeP.deleteProcess();
+        }
+    }
     /** Try to alocate resouces to the process **/
     public process requestResource(process proc){
    //     System.out.println("Processo requistando recursos: "+proc.getId());
@@ -173,7 +229,6 @@ public class handler{
         }
         return null;
     }
-    
     /** Adds executed time to resouces **/
     public void addTimeRes(process p){    
         if(p == null || inCpu.isEmpty() || p.getId() == -1)
@@ -189,7 +244,6 @@ public class handler{
             }
         }
     }
-    
     /** Gets fullProcess of the process executing **/
     public fullProcess getActualFullProcess(process p){
         for (fullProcess fullOfExe: this.inCpu){
