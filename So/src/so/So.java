@@ -9,30 +9,7 @@ import java.util.List;
  * UPDATE 07/06/2017 - ADDED A DESCRIPTION OF HOW THE ACTUAL CODE RUNS 
  */
 public class So{
-    public static void main(String[] args) {
-        List<fullProcess> input = new ArrayList();
-        /**      (new testproc(id, start, weight, deadline, new Arraylist(){{add(new resource(id, start, weight)}}**/
-        input.add(new fullProcess(1,0,6,6, new ArrayList(){{add(new resource(0, 0, 3));add(new resource(1, 0, 3));}}));
-        input.add(new fullProcess(2,0,6,6, new ArrayList(){{add(new resource(0, 1, 1));}}));
-        input.add(new fullProcess(3,2,2,5, new ArrayList(){{add(new resource(0, 1, 1));}}));
-        
-        changePriority changeP = new changePriority();
-        handler hand = new handler(input, changeP);
-        output out = new output();
-        hand.setOutput(out);
-        
-        boolean cpurunning = true;
-        while(cpurunning == true){
-           printSeparator();
-           hand.run();
-           changeP.run(hand);
-           /*for the program stay not running forever*/
-           if(changeP.getTime() == 50)
-               break;
-       }
-       System.out.println("Processos perdidos: "+changeP.getLostDline());
-       out.printOutput();
-    }
+
     /** Separator for the cycles of processessing **/
     public static void printSeparator(){System.out.println("----------------------------------------");}
 }
