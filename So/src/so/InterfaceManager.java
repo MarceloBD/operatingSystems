@@ -34,6 +34,7 @@ public class InterfaceManager implements ActionListener{
     private HashMap<Integer, String> resourceAlias;
     private ArrayList<Tarefa> process;
     private ArrayList<Recurso> resources;
+    public Logger logger;
     
     public static InterfaceManager getInstance() {
         if(instance == null) {
@@ -47,6 +48,7 @@ public class InterfaceManager implements ActionListener{
         resourceAlias = new HashMap<Integer, String>();
         process = new ArrayList<Tarefa>();
         resources = new ArrayList<Recurso>();
+        logger = new Logger();
     }
     
     public void setCurrentWindow(javax.swing.JFrame newView){
