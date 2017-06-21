@@ -67,6 +67,10 @@ public class Tarefa {
         return deadline;
     }
     
+    public int getContadorDeCiclos() {
+        return contadorDeCiclos;
+    }
+    
     public void resetPrioridade(){
         this.prioridadeAtual = this.prioridadeOriginal;
     }
