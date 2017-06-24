@@ -36,6 +36,10 @@ public class InterfaceManager implements ActionListener{
     private ArrayList<Recurso> resources;
     public Logger logger;
     
+    /**
+     * Função que retorna a instância singleton do objeto
+     * @return instancia
+     */
     public static InterfaceManager getInstance() {
         if(instance == null) {
             instance = new InterfaceManager();
@@ -51,6 +55,10 @@ public class InterfaceManager implements ActionListener{
         logger = new Logger();
     }
     
+    /**
+     * Torna a janela principal o parâmetro passado
+     * @param newView 
+     */
     public void setCurrentWindow(javax.swing.JFrame newView){
         if(actualWindow != null)
             actualWindow.setVisible(false);
@@ -92,6 +100,7 @@ public class InterfaceManager implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent ae) {
+        //Página de tarefa
         if(ae.getActionCommand().equals("Tarefa_Adicionar")) {
             try{
                 FormTarefa ft = (FormTarefa) actualWindow;
@@ -105,6 +114,8 @@ public class InterfaceManager implements ActionListener{
             FormRecurso fr = new FormRecurso(this);
             this.setCurrentWindow(fr);
         }
+        
+        //Página de Recursos
         else if(ae.getActionCommand().equals("Recurso_Adicionar")) {
             try {
                 FormRecurso fr = (FormRecurso) actualWindow;
@@ -119,6 +130,8 @@ public class InterfaceManager implements ActionListener{
             this.setCurrentWindow(fa);
             fa.setTableValues(processAlias, resourceAlias);
         }
+        
+        //Página de Atribuições
         else if(ae.getActionCommand().equals("Atribuicao_Adicionar")) {
             try {
                 FormAtribuicao fa = (FormAtribuicao) this.actualWindow;
@@ -131,22 +144,30 @@ public class InterfaceManager implements ActionListener{
         else if(ae.getActionCommand().equals("Atribuicao_Proximo")) {
             FormEstatisticasGerais feg = new FormEstatisticasGerais(this);
             this.setCurrentWindow(feg);
-            /*
-            //startPriorityExchange();
-            startPriorityTop();
-            //setStats(feg,0);
-            setStats(feg,1);
             
-            System.out.println("Nova janela");
-            */
-            this.printProcess();
-            convertProcess(process);
+            //Parte do Marcelo
+            startPriorityExchange();
+            setStats(feg,0);
+            
+            //Parte do Matheus
+            //startPriorityTop();
+            //setStats(feg,1);
+            
+            //Printar processos de input
+            //this.printProcess();
+            //convertProcess(process);
         }
+        
+        //Página de estatísticas
         else if(ae.getActionCommand().equals("Estatisticas_Encerrar")){
             System.exit(0);
         }
     }
     
+    /**
+     * Pega as informações da página de processos e armazena
+     * @param ft 
+     */
     private void getProcess(FormTarefa ft) {
         String name = ft.getProcessName();
         int weight = ft.getWeight();
@@ -158,6 +179,10 @@ public class InterfaceManager implements ActionListener{
         process.add(t);
     }
     
+    /**
+     * Pega as informações presentes na janela e registra elas
+     * @param fr 
+     */
     private void getResource(FormRecurso fr) {
         String name = fr.getResourceName();
         int id = fr.getID();
@@ -167,6 +192,10 @@ public class InterfaceManager implements ActionListener{
         resources.add(r);
     }
     
+    /**
+     * Lê os parâmetros que estão na janela e linka os processos com os recursos
+     * @param fa 
+     */
     private void linkResource(FormAtribuicao fa) {
         int processID = fa.getProcessID();
         int resourceID = fa.getResourceID();
@@ -184,6 +213,12 @@ public class InterfaceManager implements ActionListener{
         */
     }
     
+    /**
+     * Converte a tarefa da implementação do pacote RTS para a implementação
+     * fullprocess
+     * @param at
+     * @return 
+     */
     private ArrayList<fullProcess> convertProcess(ArrayList<Tarefa> at) {
         ArrayList<fullProcess> afp = new ArrayList<fullProcess>();
         for(int i = 0; i <  at.size(); i++) {
@@ -205,6 +240,11 @@ public class InterfaceManager implements ActionListener{
         return afp;
     }
     
+    /**
+     * Acha o id do recurso dado o seu nome
+     * @param name
+     * @return id
+     */
     public int findResourceID(String name) {
         for(int i = 0; i < resourceAlias.size(); i++) {
             if(resourceAlias.get(i).equals(name))
@@ -213,6 +253,11 @@ public class InterfaceManager implements ActionListener{
         return -1;
     }
     
+    /**
+     * Acha o id do processo dado o nome
+     * @param name
+     * @return id
+     */
     public int findProcessID(String name) {
         for(int i = 0; i < processAlias.size(); i++) {
             if(processAlias.get(i).equals(name))
@@ -221,7 +266,9 @@ public class InterfaceManager implements ActionListener{
         return -1;
     }
     
-    //Retorna quantas perdas ocorreram na troca de prioridade
+    /**
+     * Começa o escalonador de Troca de Prioridade
+     */
     private void startPriorityExchange(){
         List<fullProcess> input = convertProcess(process);
         
@@ -246,11 +293,19 @@ public class InterfaceManager implements ActionListener{
        out.printHistoric();
     }
     
+    /**
+     * Começa o escalonador de Topo de Prioridade
+     */
     private void startPriorityTop(){
         TopoDePrioridade top = new TopoDePrioridade(process, resources);
         top.escalona();
     }
     
+    /**
+     * Coloca todos os dados necessários na janela de resultados
+     * @param feg
+     * @param id 
+     */
     private void setStats(FormEstatisticasGerais feg,int id) {
         double waitMean = logger.getWaitMean(id);
         double responseMean = logger.getResponseMean(id);
@@ -260,6 +315,8 @@ public class InterfaceManager implements ActionListener{
         
         feg.setStats(id, responseMean, waitMean, responseDeviation, waitDeviation, lostDeadlines);
         logger.printExecution(id);
+        //Cria a janela com a simulação
+        logger.createWindow(id);
     }
     
     private void printProcess(){
@@ -267,4 +324,14 @@ public class InterfaceManager implements ActionListener{
             System.out.println(t);
         }
     }
+
+    public HashMap<Integer, String> getProcessAlias() {
+        return processAlias;
+    }
+
+    public HashMap<Integer, String> getResourceAlias() {
+        return resourceAlias;
+    }
+    
+    
 }

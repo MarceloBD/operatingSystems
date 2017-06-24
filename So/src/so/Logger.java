@@ -6,6 +6,7 @@
 package so;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -135,6 +136,29 @@ public class Logger {
                 System.out.println("Processo: " + processExecuting.get(id).get(i));
         }
         System.out.println("|-----------------------------|");
+    }
+    
+    public void createWindow(int id) {
+        ArrayList<String> processName = hashMapToArrayList(InterfaceManager.getInstance().getProcessAlias());
+        ArrayList<String> resourceName = hashMapToArrayList(InterfaceManager.getInstance().getResourceAlias());    
+        ArrayList<Integer> process = processExecuting.get(id);
+        ArrayList<Integer> resources = new ArrayList<>();
+        for(int i = 0; i < resourceExecuting.get(id).size();i++){
+            int lastIndex = resourceExecuting.get(id).get(i).size()-1;
+            resources.add(resourceExecuting.get(id).get(i).get(lastIndex));
+        }
+        String name = (id==0) ? "Troca de Prioridade" : "Topo de Prioridade";
+        Visual demo = new Visual(name,processName,resourceName,process,resources);
+        
+        demo.pack();
+        demo.setVisible(true);
+    }
+    
+    private ArrayList<String> hashMapToArrayList(HashMap<Integer, String> hashMap) {
+        ArrayList<String> al = new ArrayList<String>();
+        for(int i = 0; i < hashMap.size(); i++)
+            al.add(hashMap.get(i));
+        return al;
     }
     
     //Getters ------------------------------------------------------------------
