@@ -17,8 +17,10 @@ public class output {
     public enum executed{               //state as a result of the processessing
         Executado, Perdido
     }
+    List<process> historic;             //list of the processes executing each time and their resources
     public output(){
         processOut = new ArrayList();
+        historic = new ArrayList();
     }
     /** Adds a process to the output list **/
     public void addOutput(fullProcess p){
@@ -41,4 +43,38 @@ public class output {
         }
         else return executed.Executado;
     }
+    /**Adds a process execution**/
+    public void addHistoric(process p){
+        process aux = new process(p.getId(),p.getDline(),p.getPriority());
+        for(int i: p.getResource()){
+            aux.addResource(i);
+        }
+        this.historic.add(aux);
+    }
+    /**Prints the historic of the processes that have been executed**/
+    public void printHistoric(){
+        int i = 1;
+        for(process p: historic){
+            System.out.println("---- Tempo: "+i+" Processo executado: "+p.getId()+" Recursos usados: "+p.getResource());
+            i++;
+        }
+    }
+    
+    public void sendLog() {
+        for(int i = 0; i < processOut.size(); i++) {
+            int waitTime = processOut.get(i).getInsertCpuTime() - processOut.get(i).getArriveTime();
+            InterfaceManager.getInstance().logger.addWaitTime(i, waitTime);
+            if(processOut.get(i).getFinishedTime() != Integer.MAX_VALUE) {
+                double responseTime = processOut.get(i).getFinishedTime() - processOut.get(i).getArriveTime();
+                responseTime = (double) responseTime / processOut.get(i).getWeight();
+                InterfaceManager.getInstance().logger.addResponseTime(i, responseTime);
+            }
+        }
+        for(int i = 0; i < historic.size(); i++){
+            process p = historic.get(i);
+            ArrayList<Integer> resources = new ArrayList<Integer>(p.getResource());
+            InterfaceManager.getInstance().logger.insertCurrentExecution(0, p.getId(), resources);
+        }
+    }
 }
+

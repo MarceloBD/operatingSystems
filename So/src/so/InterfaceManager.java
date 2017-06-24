@@ -129,14 +129,17 @@ public class InterfaceManager implements ActionListener{
             }
         }
         else if(ae.getActionCommand().equals("Atribuicao_Proximo")) {
-            FormEstatisticasGerais feg = new FormEstatisticasGerais();
+            FormEstatisticasGerais feg = new FormEstatisticasGerais(this);
             this.setCurrentWindow(feg);
-            int priorityLost = startPriorityExchange();
-            int topLost = startPriorityTop();
-            feg.setDeadline(0, priorityLost);
-            feg.setDeadline(1, topLost);
+            //startPriorityExchange();
+            startPriorityTop();
+            //setStats(feg,0);
+            setStats(feg,1);
             
             System.out.println("Nova janela");
+        }
+        else if(ae.getActionCommand().equals("Estatisticas_Encerrar")){
+            System.exit(0);
         }
     }
     
@@ -194,7 +197,7 @@ public class InterfaceManager implements ActionListener{
         return afp;
     }
     
-    private int findResourceID(String name) {
+    public int findResourceID(String name) {
         for(int i = 0; i < resourceAlias.size(); i++) {
             if(resourceAlias.get(i).equals(name))
                 return i;
@@ -202,8 +205,16 @@ public class InterfaceManager implements ActionListener{
         return -1;
     }
     
+    public int findProcessID(String name) {
+        for(int i = 0; i < processAlias.size(); i++) {
+            if(processAlias.get(i).equals(name))
+                return i;
+        }
+        return -1;
+    }
+    
     //Retorna quantas perdas ocorreram na troca de prioridade
-    private int startPriorityExchange(){
+    private void startPriorityExchange(){
         List<fullProcess> input = convertProcess(process);
         
         changePriority changeP = new changePriority();
@@ -220,14 +231,26 @@ public class InterfaceManager implements ActionListener{
            if(changeP.getTime() == 50)
                break;
        }
-       System.out.println("Processos perdidos: "+changeP.getLostDline());
+       logger.setMissedDeadline(0, changeP.getLostDline());
+       out.sendLog();
+       //System.out.println("Processos perdidos: "+changeP.getLostDline());
        out.printOutput();
-       return 0;
+       out.printHistoric();
     }
     
-    private int startPriorityTop(){
+    private void startPriorityTop(){
         TopoDePrioridade top = new TopoDePrioridade(process, resources);
-        int perdas = top.escalona();
-        return perdas;
+        top.escalona();
+    }
+    
+    private void setStats(FormEstatisticasGerais feg,int id) {
+        double waitMean = logger.getWaitMean(id);
+        double responseMean = logger.getResponseMean(id);
+        double waitDeviation = logger.getWaitDeviation(id);
+        double responseDeviation = logger.getResponseDeviation(id);
+        int lostDeadlines = logger.getMissedDeadlines(id);
+        
+        feg.setStats(id, responseMean, waitMean, responseDeviation, waitDeviation, lostDeadlines);
+        logger.printExecution(id);
     }
 }

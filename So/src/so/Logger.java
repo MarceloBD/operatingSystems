@@ -12,10 +12,10 @@ import java.util.ArrayList;
  * @author Arthur
  */
 public class Logger {
-    private ArrayList<ArrayList<Integer>> responseTime;
+    private ArrayList<ArrayList<Double>> responseTime;
     private ArrayList<ArrayList<Integer>> waitTime;
     private ArrayList<ArrayList<Integer>> processExecuting;
-    private ArrayList<ArrayList<Integer>> resourceExecuting;
+    private ArrayList<ArrayList<ArrayList<Integer>>> resourceExecuting;
     private double[] responseMean;
     private double[] responseDeviation;
     private double[] waitMean;
@@ -24,15 +24,15 @@ public class Logger {
     private boolean[] calculatedStats;
     
     public Logger() {
-        responseTime = new ArrayList<ArrayList<Integer>>();
+        responseTime = new ArrayList<ArrayList<Double>>();
         waitTime = new ArrayList<ArrayList<Integer>>();
         processExecuting = new ArrayList<ArrayList<Integer>>();
-        resourceExecuting = new ArrayList<ArrayList<Integer>>();
+        resourceExecuting = new ArrayList<ArrayList<ArrayList<Integer>>>();
         for(int i = 0; i < 2; i++) {
-            responseTime.add(new ArrayList<Integer>());
+            responseTime.add(new ArrayList<Double>());
             waitTime.add(new ArrayList<Integer>());
             processExecuting.add(new ArrayList<Integer>());
-            resourceExecuting.add(new ArrayList<Integer>());
+            resourceExecuting.add(new ArrayList<ArrayList<Integer>>());
         }
         responseMean = new double[2];
         responseDeviation = new double[2];
@@ -49,7 +49,7 @@ public class Logger {
      * @param id
      * @param responseT
      */
-    public void addResponseTime(int id, int responseT) {
+    public void addResponseTime(int id, double responseT) {
         responseTime.get(id).add(responseT);
     }
     
@@ -68,7 +68,7 @@ public class Logger {
      */
     private void calculateValue(int id) {
         double sum = 0;
-        for(int response : responseTime.get(id)) {
+        for(double response : responseTime.get(id)) {
             sum += response;
         }
         responseMean[id] = sum / (double)responseTime.get(id).size();
@@ -79,7 +79,7 @@ public class Logger {
         waitMean[id] = sum / (double)waitTime.get(id).size();
         
         double variance = 0;
-        for(int response : responseTime.get(id)) {
+        for(double response : responseTime.get(id)) {
             variance += Math.pow(response-responseMean[id],2);
         }
         variance /= (responseTime.get(id).size() - 1);
@@ -118,9 +118,23 @@ public class Logger {
      * @param processID
      * @param resourceID 
      */
-    public void insertCurrentExecution(int id, int processID, int resourceID){
+    public void insertCurrentExecution(int id, int processID, ArrayList<Integer> resourceID){
         this.processExecuting.get(id).add(processID);
         this.resourceExecuting.get(id).add(resourceID);
+    }
+    
+    public void printExecution(int id) {
+        System.out.println("|-----------------------------|");
+        System.out.println("Experimento " + id);
+        for(int i = 0; i < processExecuting.get(id).size(); i++) {
+            System.out.println("-> Instante " + i);
+            if(resourceExecuting.get(id).get(i).get(0) != -1)
+                System.out.println("Processo: " + processExecuting.get(id).get(i) +
+                               ", Recurso: "+ resourceExecuting.get(id).get(i));
+            else
+                System.out.println("Processo: " + processExecuting.get(id).get(i));
+        }
+        System.out.println("|-----------------------------|");
     }
     
     //Getters ------------------------------------------------------------------
@@ -156,7 +170,7 @@ public class Logger {
         return this.processExecuting.get(id);
     }
     
-    public ArrayList<Integer> getResourceExecution(int id) {
+    public ArrayList<ArrayList<Integer>> getResourceExecution(int id) {
         return this.resourceExecuting.get(id);
     }
 }

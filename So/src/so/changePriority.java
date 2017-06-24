@@ -43,11 +43,13 @@ public class changePriority{
         hand.addTimeRes(proc);
         time++;
         this.printScheduler();
-        System.out.println("Recursos usados pelo processo atual: "+proc.getResource() + " Prioridade do processo atual: !"+this.proc.getPriority() +"! Processos em espera: "+this.priorityQueue );
+        System.out.println("Recursos usados pelo processo atual: "+this.proc.getResource() + " Prioridade do processo atual: !"+this.proc.getPriority() +"! Processos em espera: "+this.priorityQueue );
         System.out.println("Processos com prioridade trocada: "+this.storedID);
         printPrio();
         this.updatePrio();
     }
+   
+    
     /** Makes all processes to lose -1 in priority each cicle **/
     public void updatePrio(){
         Iterator<process> ip = this.getQueue().iterator();
@@ -157,7 +159,7 @@ public class changePriority{
     }
     /** Prints the state of the scheduler **/
     public void printScheduler(){
-        System.out.println("Processo executando: > "+this.proc.getId()+" < Tempo atual: |"+this.time+"| Tempo que processo já executou: "+proc.getExtime());
+        System.out.println("Processo executando: > "+this.proc.getId()+" < Tempo atual: |"+this.time+"| Tempo que processo jรก executou: "+proc.getExtime());
     }
     /** Changes the priorities of the processes **/
     public void changeProcessP(process p, process q){

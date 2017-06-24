@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Class control the process that will be arriving at the scheduler and its times of execution **/
 public class handler{                            
@@ -19,11 +21,12 @@ public class handler{
     }
     /** Starts the control system **/
     public void run(){
+        this.addHistoric();
         this.checkEndedResource();
         this.tryDeleteProcess();
         this.checkDeadline();
         this.tryInsertProcess();
-        process p = this.requestResource(changeP.getProcess());    
+        process p = this.requestResource(changeP.getProcess());
         if(p != null){
        //     if(this.alreadyStored(changeP.getProcess()) == false)
                 changeP.addStoredId(changeP.getProcess().getId());changeP.addStoredPrio(changeP.getProcess().getPriority());
@@ -31,6 +34,13 @@ public class handler{
                 changeP.addStoredId(p.getId());                   changeP.addStoredPrio(p.getPriority());
             changeP.change(p); 
             changeP.getProcess().setBlocked(true);
+        }
+    }
+     /**Adds the resource execution to output**/
+    public void addHistoric(){
+        if(changeP.getTime()!=0){
+            System.out.println("aquiiiiiiiiiiiiiiii - "+changeP.getProcess().getId()+changeP.getProcess().getResource());
+            out.addHistoric(changeP.getProcess());
         }
     }
     /** Adds the process to the outputed processes list **/

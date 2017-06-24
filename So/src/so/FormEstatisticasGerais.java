@@ -5,22 +5,49 @@
  */
 package so;
 
+import java.awt.event.ActionListener;
+
 /**
  *
  * @author luiz
  */
 public class FormEstatisticasGerais extends javax.swing.JFrame {
    
-    public FormEstatisticasGerais() {
+    ActionListener al;
+    
+    public FormEstatisticasGerais(ActionListener a) {
         initComponents();
-        this.setLocationRelativeTo(null);
+        this.al = a;
+        this.encerrar.setActionCommand("Estatisticas_Encerrar");
+        this.encerrar.addActionListener(a);
     }
     
-    public void setDeadline(int type, int deadline) {
-        if (type == 0)
-            this.deadlinetroca.setText(String.valueOf(deadline));
-        else
-            this.deadlinetopo.setText(String.valueOf(deadline));
+    /**
+     * Define os valores dos campos
+     * @param id
+     * @param avarageResponseTime
+     * @param avarageWaitTime
+     * @param responseTimeDeviation
+     * @param waitTimeDeviation
+     * @param lostDeadlines 
+     */
+    public void setStats(int id, double avarageResponseTime, double avarageWaitTime,
+                         double responseTimeDeviation, double waitTimeDeviation,
+                         int lostDeadlines) {
+        if(id == 0) {
+            this.tempomediorespostatroca.setText(Double.toString(avarageResponseTime));
+            this.tempomedioesperatroca.setText(Double.toString(avarageWaitTime));
+            this.desviopadraorespostatroca.setText(Double.toString(responseTimeDeviation));
+            this.desviopadraoesperatroca.setText(Double.toString(waitTimeDeviation));
+            this.deadlinetroca.setText(Integer.toString(lostDeadlines));
+        }
+        else {
+            this.tempomediorespostatopo.setText(Double.toString(avarageResponseTime));
+            this.tempomedioesperatopo.setText(Double.toString(avarageWaitTime));
+            this.desviopadraorespostatopo.setText(Double.toString(responseTimeDeviation));
+            this.desviopadraoesperatopo.setText(Double.toString(waitTimeDeviation));
+            this.deadlinetopo.setText(Integer.toString(lostDeadlines));
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -53,7 +80,7 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
         tempomedioesperatopo = new javax.swing.JTextField();
         desviopadraoesperatopo = new javax.swing.JTextField();
         deadlinetopo = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        encerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Estatísticas Gerais");
@@ -226,11 +253,11 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
-        jButton1.setText("Encerrar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        encerrar.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        encerrar.setText("Encerrar");
+        encerrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                encerrarActionPerformed(evt);
             }
         });
 
@@ -245,7 +272,7 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(encerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -262,7 +289,7 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(encerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -277,9 +304,9 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tempomediorespostatopoActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void encerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_encerrarActionPerformed
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_encerrarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -289,7 +316,7 @@ public class FormEstatisticasGerais extends javax.swing.JFrame {
     private javax.swing.JTextField desviopadraoesperatroca;
     private javax.swing.JTextField desviopadraorespostatopo;
     private javax.swing.JTextField desviopadraorespostatroca;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton encerrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

@@ -150,9 +150,11 @@ public class TopoDePrioridade {
                         break;
                     }
                 }
-                InterfaceManager.getInstance().logger.insertCurrentExecution(1, Integer.parseInt(tarefaAtual.getId()), Integer.parseInt(idRecurso));//info de processo e recurso utilizado
+                ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
+                listaRecursos.add(InterfaceManager.getInstance().findResourceID(idRecurso));
+                InterfaceManager.getInstance().logger.insertCurrentExecution(1, InterfaceManager.getInstance().findProcessID(tarefaAtual.getId()), listaRecursos);//info de processo e recurso utilizado
                 if(tarefaAtual.incrementaContador() == 1){//incrementa o contador da tarefa
-                    InterfaceManager.getInstance().logger.addResponseTime(1, this.ciclo - tarefaAtual.getTempoChegada());
+                    InterfaceManager.getInstance().logger.addResponseTime(1, (double) (this.ciclo - tarefaAtual.getTempoChegada())/tarefaAtual.getDuracao());
                     
                     if(this.ciclo > tarefaAtual.getDeadline())//verifica se perdeu o deadline
                         contadorPerdas++;
