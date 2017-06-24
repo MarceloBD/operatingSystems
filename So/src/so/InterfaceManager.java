@@ -150,12 +150,12 @@ public class InterfaceManager implements ActionListener{
             setStats(feg,0);
             
             //Parte do Matheus
-            //startPriorityTop();
-            //setStats(feg,1);
+            startPriorityTop();
+            setStats(feg,1);
             
             //Printar processos de input
-            //this.printProcess();
-            //convertProcess(process);
+            this.printProcess();
+            convertProcess(process);
         }
         
         //Página de estatísticas

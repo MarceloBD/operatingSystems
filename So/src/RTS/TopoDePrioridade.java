@@ -19,7 +19,7 @@ public class TopoDePrioridade {
         this.tarefasNaoIniciadas = new ArrayList<>(tarefasNaoIniciadas);
         this.recursos = new ArrayList<>(recursos);
         this.topoPrioridade = new ArrayList<>();
-        this.topoPrioridade.add(0);
+        this.topoPrioridade.add(1000);
         this.tarefasIniciadas = new ArrayList<>();
         this.ciclo = 0;
         this.recursosUtilizados = new HashMap<>();
@@ -47,7 +47,7 @@ public class TopoDePrioridade {
         while(tarefasIniciadas.size() > 0){
             int menorPos = 0;
             for(int i = 0; i < tarefasIniciadas.size(); i++){
-                if(tarefasIniciadas.get(i).getPrioridadeAtual()< tarefasIniciadas.get(menorPos).getTempoChegada())
+                if(tarefasIniciadas.get(i).getPrioridadeAtual()< tarefasIniciadas.get(menorPos).getPrioridadeAtual())
                         menorPos = i;
             }
             
@@ -67,7 +67,10 @@ public class TopoDePrioridade {
                     }                        
                 }
             }
+            System.out.println("Recurso: " + r.getId());
+            System.out.println("Prioridade: "+ r.getPrioridade());
         }
+        System.out.println("\n");
     }
     
     private void iniciaTarefas(){
@@ -88,6 +91,7 @@ public class TopoDePrioridade {
             ordenaPrioridade();//ordena as tarefas em ordem de prioridade
             
             if(!tarefasIniciadas.isEmpty()){
+                ordenaPrioridade();
                 Tarefa tarefaAtual = tarefasIniciadas.remove(0);//tarefa com maior prioridade
                 while(tarefaAtual.getEstado() == Tarefa.BLOQUEADO){//procura uma tarefa que pode ser executada
                     int flag = 0;
@@ -118,15 +122,17 @@ public class TopoDePrioridade {
                             tarefasIniciadas.remove(tarefasIniciadas.indexOf(tarefaAtual));//remove ela da lista
                         }else{//o recurso esta livre
                             if(tarefaAtual.getPrioridadeAtual() <= this.topoPrioridade.get(0)){//prioridade é menor doq o topo de prioridade
+                                Recurso recurso = null;
                                 for(Recurso r : recursos){//procura o recurso na lista
                                     if(s.equals(r.getId())){
-                                        Recurso recurso = r;
-                                        recursos.remove(recursos.indexOf(r));
-                                        recursosUtilizados.put(recurso.getId(), recurso);//coloca ele no map de recursos utilizados
+                                        recurso = r;
+                                        break;
                                     }
                                 }
+                                recursos.remove(recursos.indexOf(recurso));
+                                recursosUtilizados.put(recurso.getId(), recurso);//coloca ele no map de recursos utilizados
                                 recursosUtilizados.get(s).bloquearRecurso(tarefaAtual);//bloqueia o recurso
-                                recursos.remove(recursos.indexOf(recursosUtilizados.get(s)));
+                                recursos.remove(recursosUtilizados.get(s));
                                 recursos.add(recursosUtilizados.get(s));
                                 if(recursosUtilizados.get(s).getPrioridade() < this.topoPrioridade.get(0)){//maior prioridade
                                     this.topoPrioridade.add(recursosUtilizados.get(s).getPrioridade());//coloca a prioridade na lista de topo
@@ -135,10 +141,24 @@ public class TopoDePrioridade {
                                 i = 1;
                             }else{//nao é mais prioritario
                                 tarefaAtual.setEstado(Tarefa.BLOQUEADO);//mesma rotina de quando o recurso ja esta alocado
-                                recursosUtilizados.get(s).getTarefa().setPrioridadeAtual(tarefaAtual.getPrioridadeAtual());
                                 tarefasIniciadas.add(tarefaAtual);
-                                tarefaAtual = recursosUtilizados.get(s).getTarefa();
-                                tarefasIniciadas.remove(tarefasIniciadas.indexOf(tarefaAtual));
+                                tarefaAtual = tarefasIniciadas.remove(0);
+                                while(tarefaAtual.getEstado() == Tarefa.BLOQUEADO){//procura uma tarefa que pode ser executada
+                                    int flag = 0;
+                                    for(RecursoTarefa rt : tarefaAtual.getRecursos()){
+                                       if(recursosUtilizados.containsKey(rt.getId())){//recurso nao esta mais bloqueado
+                                           flag = 1;
+                                       }
+
+                                       if(flag == 1) break;
+                                    }
+                                    if(flag == 0){
+                                        tarefaAtual.setEstado(Tarefa.PRONTO);//tarefa pronta para executar
+                                        break;
+                                    }
+                                    tarefasIniciadas.add(tarefaAtual);
+                                    tarefaAtual = tarefasIniciadas.remove(0);//troca a tarefa, se precisar
+                                }
                             }
                         }
                     }
@@ -171,16 +191,23 @@ public class TopoDePrioridade {
                             recursos.add(r);
                             tarefaAtual.resetPrioridade();//reset a prioridade da tarefa atual
                             if(this.topoPrioridade.contains(r.getPrioridade())){//se ess recurso participou do topo, retira ele da lista
-                                this.topoPrioridade.remove(r.getPrioridade());
+                                this.topoPrioridade.remove(this.topoPrioridade.indexOf(r.getPrioridade()));
                                 Collections.sort(this.topoPrioridade);
                             }
                         }
                     }
-
+                    System.out.println("Ciclo: " + this.ciclo);
+                    System.out.println("Tarefa Atual: " + tarefaAtual.getId());
                     tarefasIniciadas.add(tarefaAtual);
+                    ordenaPrioridade();
                 }
             }
             this.ciclo++;
+            for(Tarefa t:tarefasIniciadas){
+                System.out.println("Tarefa: " + t.getId());
+                System.out.println("Prioridade: " + t.getPrioridadeAtual());
+            }
+            System.out.println("\n");
         }
         return contadorPerdas;
     }

@@ -80,6 +80,8 @@ public class handler{
     /** Tries to insert the time that the process got to be executed for the first time **/
     public void trySetInsertTime(process proc){
         fullProcess full = this.getActualFullProcess(proc);
+        if(full == null)
+            return;
         if(full.getProcess().getExtime()==0){
             full.setInsertCpuTime(changeP.getTime());
             System.out.println("================"+ full.getInsertCpuTime());

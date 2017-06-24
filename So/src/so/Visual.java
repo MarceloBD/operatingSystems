@@ -29,14 +29,14 @@ public class Visual extends ApplicationFrame {
      */
     public Visual(String title, ArrayList<String> taskNames, ArrayList<String> resourceNames,
                   ArrayList<Integer> process, ArrayList<Integer> resources) {
-        super(title);
-        JPanel chartPanel = new ChartPanel(createChart(createDataset(process,resources,resourceNames),taskNames));
+        super("Escalonador Simulação");
+        JPanel chartPanel = new ChartPanel(createChart(createDataset(process,resources,resourceNames),title,taskNames));
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
         setContentPane(chartPanel);
     }
 
-    private JFreeChart createChart(IntervalXYDataset dataset, ArrayList<String> TaskNames) {
-        JFreeChart chart = ChartFactory.createXYBarChart("Projeto S0",
+    private JFreeChart createChart(IntervalXYDataset dataset, String graphName, ArrayList<String> TaskNames) {
+        JFreeChart chart = ChartFactory.createXYBarChart(graphName,
                                  "Tempo", true, "Tempo", dataset, PlotOrientation.HORIZONTAL,
                                   true, false, false);
         XYPlot plot = (XYPlot) chart.getPlot();

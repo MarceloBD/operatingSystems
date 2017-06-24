@@ -63,16 +63,24 @@ public class output {
     public void sendLog() {
         for(int i = 0; i < processOut.size(); i++) {
             int waitTime = processOut.get(i).getInsertCpuTime() - processOut.get(i).getArriveTime();
-            InterfaceManager.getInstance().logger.addWaitTime(i, waitTime);
+            InterfaceManager.getInstance().logger.addWaitTime(0, waitTime);
             if(processOut.get(i).getFinishedTime() != Integer.MAX_VALUE) {
                 double responseTime = processOut.get(i).getFinishedTime() - processOut.get(i).getArriveTime();
                 responseTime = (double) responseTime / processOut.get(i).getWeight();
-                InterfaceManager.getInstance().logger.addResponseTime(i, responseTime);
+                InterfaceManager.getInstance().logger.addResponseTime(0, responseTime);
             }
         }
         for(int i = 0; i < historic.size(); i++){
             process p = historic.get(i);
-            ArrayList<Integer> resources = new ArrayList<Integer>(p.getResource());
+            ArrayList<Integer> resources;
+            resources = new ArrayList<Integer>();
+            if(p.getResource().size() > 0)
+                for(int j = 0; j < p.getResource().size(); j++){
+                    resources.add(p.getResource().get(j));
+                }
+            else {
+                resources.add(-1);
+            }
             InterfaceManager.getInstance().logger.insertCurrentExecution(0, p.getId(), resources);
         }
     }
