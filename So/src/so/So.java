@@ -111,6 +111,14 @@ class resource{
     public int getUsedtime(){return this.exeTime;}
     public int getWeight(){return this.weight;}
     public int getId(){return this.id;}
+    
+    @Override
+    public String toString(){
+        String s = "ID: " + id + "\n";
+        s = s +  "Inicio: " + startTime + "\n";
+        s = s + "Duracao: " + this.weight;
+        return s;
+    }
 }
 /** Class that associates the process, resources and other parameters to control processes states **/
 class fullProcess{            
@@ -143,4 +151,17 @@ class fullProcess{
     public int getFinishedTime(){return this.finishedTime;}
     public void setInsertCpuTime(int t){this.insetCpuTime = t;}
     public int getInsertCpuTime(){return this.insetCpuTime;}
+    
+    @Override
+    public String toString(){
+        String s = "ID: " + this.proc.id + "\n";
+        s = s + "Chegada: " + this.arriveTime + "\n";
+        s = s + "Peso: " + this.weight + "\n";
+        s = s + "Deadline: " + this.proc.dline + "\n";
+        s = s + "- Recursos:\n";
+        for(int i = 0; i < this.resources.size(); i++) {
+            s = s + resources.get(i).toString() + "\n|\n";
+        }
+        return s;
+    }
 }

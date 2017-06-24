@@ -116,4 +116,17 @@ public class Tarefa {
         }
         return ids;
     }
+    
+    @Override
+    public String toString(){
+        String s = "ID: " + this.id + "\n";
+        s = s + "Chegada: " + this.tempoChegada + "\n";
+        s = s + "Peso: " + this.duracao + "\n";
+        s = s + "Deadline: " + this.deadline + "\n";
+        s = s + "- Recursos:\n";
+        for(int i = 0; i < this.recursos.size(); i++) {
+            s = s + recursos.get(i).toString() + "\n|\n";
+        }
+        return s;
+    }
 }

@@ -131,12 +131,16 @@ public class InterfaceManager implements ActionListener{
         else if(ae.getActionCommand().equals("Atribuicao_Proximo")) {
             FormEstatisticasGerais feg = new FormEstatisticasGerais(this);
             this.setCurrentWindow(feg);
+            /*
             //startPriorityExchange();
             startPriorityTop();
             //setStats(feg,0);
             setStats(feg,1);
             
             System.out.println("Nova janela");
+            */
+            this.printProcess();
+            convertProcess(process);
         }
         else if(ae.getActionCommand().equals("Estatisticas_Encerrar")){
             System.exit(0);
@@ -193,6 +197,10 @@ public class InterfaceManager implements ActionListener{
             }
             fullProcess f = new fullProcess(i,t.getTempoChegada(),t.getDuracao(),t.getDeadline(),ar);
             afp.add(f);
+        }
+        System.out.println("Conversão Marcelo: ");
+        for(int i =0; i < afp.size(); i++) {
+            System.out.println(afp.get(i));
         }
         return afp;
     }
@@ -252,5 +260,11 @@ public class InterfaceManager implements ActionListener{
         
         feg.setStats(id, responseMean, waitMean, responseDeviation, waitDeviation, lostDeadlines);
         logger.printExecution(id);
+    }
+    
+    private void printProcess(){
+        for(Tarefa t : process) {
+            System.out.println(t);
+        }
     }
 }

@@ -25,4 +25,12 @@ public class RecursoTarefa {
     public int getDuracao() {
         return duracao;
     }
+    
+    @Override
+    public String toString(){
+        String s = "ID: " + id + "\n";
+        s = s +  "Inicio: " + tempoDeInicio + "\n";
+        s = s + "Duracao: " + this.duracao;
+        return s;
+    }
 }
