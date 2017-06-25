@@ -78,10 +78,12 @@ public class Visual extends ApplicationFrame {
             
             int rec = recursos.get(i);
             int tar = tarefas.get(i);
-            if(rec != -1)
-                concatena(s.get(rec),t,tar);
-            else
-                concatena(s.get(nomeRecursos.size()), t, tar);
+            if (tar > -1) {
+                if(rec != -1)
+                    concatena(s.get(rec),t,tar);
+                else
+                    concatena(s.get(nomeRecursos.size()), t, tar);
+            }
         }
         
         for(XYIntervalSeries interval : s)

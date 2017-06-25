@@ -15,7 +15,7 @@ public class Recurso {
     public Recurso(String id) {
         this.id = id;
         this.estado = Recurso.LIBERADO;
-        this.prioridade = 0;
+        this.prioridade = 1000;
         this.tarefa = null;
     }   
     

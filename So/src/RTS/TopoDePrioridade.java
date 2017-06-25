@@ -13,7 +13,6 @@ public class TopoDePrioridade {
     private HashMap<String, Recurso> recursosUtilizados;//quais recursos estao alocados no momento
     private ArrayList<Integer> topoPrioridade;//lista ordenada com os 
     private int ciclo;//ciclo do processador
-    private int contadorPerdas = 0;
 
     public TopoDePrioridade(ArrayList<Tarefa> tarefasNaoIniciadas, ArrayList<Recurso> recursos) {
         this.tarefasNaoIniciadas = new ArrayList<>(tarefasNaoIniciadas);
@@ -82,11 +81,11 @@ public class TopoDePrioridade {
         }
     }
     
-    public int escalona(){
+    public void escalona(){
         ordenaNaoIniciadas();
         setPrioridadeRecursos();
         
-        while(this.ciclo < 1000){//numero grande, só pra teste
+        while(!tarefasIniciadas.isEmpty() || !tarefasNaoIniciadas.isEmpty()){//numero grande, só pra teste
             iniciaTarefas();//verifica se alguma tarefa deve entrar no processador nesse ciclo
             ordenaPrioridade();//ordena as tarefas em ordem de prioridade
             
@@ -170,15 +169,28 @@ public class TopoDePrioridade {
                         break;
                     }
                 }
-                ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
-                listaRecursos.add(InterfaceManager.getInstance().findResourceID(idRecurso));
-                InterfaceManager.getInstance().logger.insertCurrentExecution(1, InterfaceManager.getInstance().findProcessID(tarefaAtual.getId()), listaRecursos);//info de processo e recurso utilizado
+                
                 if(tarefaAtual.incrementaContador() == 1){//incrementa o contador da tarefa
-                    InterfaceManager.getInstance().logger.addResponseTime(1, (double) (this.ciclo - tarefaAtual.getTempoChegada())/tarefaAtual.getDuracao());
                     
-                    if(this.ciclo > tarefaAtual.getDeadline())//verifica se perdeu o deadline
-                        contadorPerdas++;
+                    InterfaceManager.getInstance().logger.addResponseTime(1, (double) (this.ciclo - tarefaAtual.getTempoChegada())/tarefaAtual.getDuracao());
+                    ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
+                    listaRecursos.add(InterfaceManager.getInstance().findResourceID(idRecurso));
+                    InterfaceManager.getInstance().logger.insertCurrentExecution(1, InterfaceManager.getInstance().findProcessID(tarefaAtual.getId()), listaRecursos);//info de processo e recurso utilizado
+                    
+                }else if(this.ciclo >= tarefaAtual.getDeadline()){//verifica se perdeu o deadline
+                    
+                    InterfaceManager.getInstance().logger.incrementDeadline(1);
+                    System.out.println("deadline: " + tarefaAtual.getDeadline());
+                    ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
+                    listaRecursos.add(-1);
+                    InterfaceManager.getInstance().logger.insertCurrentExecution(1, -1, listaRecursos);//info de processo e recurso utilizado
+                
                 }else{
+                    
+                    ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
+                    listaRecursos.add(InterfaceManager.getInstance().findResourceID(idRecurso));
+                    InterfaceManager.getInstance().logger.insertCurrentExecution(1, InterfaceManager.getInstance().findProcessID(tarefaAtual.getId()), listaRecursos);//info de processo e recurso utilizado
+                    
                     if(tarefaAtual.getContadorDeCiclos() == 1){
                         InterfaceManager.getInstance().logger.addWaitTime(1, this.ciclo - tarefaAtual.getTempoChegada());
                     }
@@ -201,6 +213,12 @@ public class TopoDePrioridade {
                     tarefasIniciadas.add(tarefaAtual);
                     ordenaPrioridade();
                 }
+                
+                tarefaAtual = null;
+            }else{
+                ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
+                listaRecursos.add(-1);
+                InterfaceManager.getInstance().logger.insertCurrentExecution(1, -1, listaRecursos);//info de processo e recurso utilizado
             }
             this.ciclo++;
             for(Tarefa t:tarefasIniciadas){
@@ -209,7 +227,7 @@ public class TopoDePrioridade {
             }
             System.out.println("\n");
         }
-        return contadorPerdas;
+        return;
     }
     
 }
