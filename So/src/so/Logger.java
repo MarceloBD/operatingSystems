@@ -80,17 +80,21 @@ public class Logger {
         waitMean[id] = sum / (double)waitTime.get(id).size();
         
         double variance = 0;
-        for(double response : responseTime.get(id)) {
-            variance += Math.pow(response-responseMean[id],2);
+        if(responseTime.get(id).size() > 1) {
+            for(double response : responseTime.get(id)) {
+                variance += Math.pow(response-responseMean[id],2);
+            }
+            variance /= (responseTime.get(id).size() - 1);
         }
-        variance /= (responseTime.get(id).size() - 1);
         responseDeviation[id] = Math.sqrt(variance);
         
         variance = 0;
-        for(int response : waitTime.get(id)) {
-            variance += Math.pow(response-waitMean[id],2);
+        if(waitTime.get(id).size() > 1) {
+            for(int response : waitTime.get(id)) {
+                variance += Math.pow(response-waitMean[id],2);
+            }
+            variance /= (waitTime.get(id).size() - 1);
         }
-        variance /= (waitTime.get(id).size() - 1);
         waitDeviation[id] = Math.sqrt(variance);
         
         calculatedStats[id] = true;

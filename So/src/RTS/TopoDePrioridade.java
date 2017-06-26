@@ -172,6 +172,20 @@ public class TopoDePrioridade {
                 
                 if(tarefaAtual.incrementaContador() == 1){//incrementa o contador da tarefa
                     
+                    ArrayList<String> recursosParaLiberar = tarefaAtual.precisaLiberar();//tarefa terminou de usar um recurso
+                    for(String s : recursosParaLiberar){//para cada recurso que é preciso liberar
+                        if(recursosUtilizados.containsKey(s)){
+                            Recurso r = recursosUtilizados.remove(s);
+                            r.liberarRecurso();//libera o recurso
+                            recursos.add(r);
+                            tarefaAtual.resetPrioridade();//reset a prioridade da tarefa atual
+                            if(this.topoPrioridade.contains(r.getPrioridade())){//se ess recurso participou do topo, retira ele da lista
+                                this.topoPrioridade.remove(this.topoPrioridade.indexOf(r.getPrioridade()));
+                                Collections.sort(this.topoPrioridade);
+                            }
+                        }
+                    }
+                    
                     InterfaceManager.getInstance().logger.addResponseTime(1, (double) (this.ciclo - tarefaAtual.getTempoChegada())/tarefaAtual.getDuracao());
                     ArrayList<Integer> listaRecursos = new ArrayList<Integer>();
                     listaRecursos.add(InterfaceManager.getInstance().findResourceID(idRecurso));
